@@ -801,6 +801,15 @@ pub fn section(di: Dwarf, dwarf_section: Section.Id) ?[]const u8 {
     return if (di.sections[@intFromEnum(dwarf_section)]) |s| s.data else null;
 }
 
+pub fn sectionRelativeOffset(di: Dwarf, dwarf_section: Section.Id, offset: u64) !usize {
+    const casted_offset = cast(usize, offset) orelse return bad();
+
+    if (di.sections[@intFromEnum(dwarf_section)]) |s|
+        if (s.virtual_address) |va|
+            return casted_offset - va;
+    return casted_offset;
+}
+
 pub fn sectionVirtualOffset(di: Dwarf, dwarf_section: Section.Id, base_address: usize) ?i64 {
     return if (di.sections[@intFromEnum(dwarf_section)]) |s| s.virtualOffset(base_address) else null;
 }
@@ -1203,7 +1212,7 @@ const DebugRangeIterator = struct {
             .compile_unit = compile_unit,
             .fbr = .{
                 .buf = debug_ranges,
-                .pos = cast(usize, ranges_offset) orelse return bad(),
+                .pos = try di.sectionRelativeOffset(section_type, ranges_offset),
                 .endian = di.endian,
             },
         };
@@ -1337,7 +1346,7 @@ fn getAbbrevTable(di: *Dwarf, allocator: Allocator, abbrev_offset: u64) !*const 
 fn parseAbbrevTable(di: *Dwarf, allocator: Allocator, offset: u64) !Abbrev.Table {
     var fbr: FixedBufferReader = .{
         .buf = di.section(.debug_abbrev).?,
-        .pos = cast(usize, offset) orelse return bad(),
+        .pos = try di.sectionRelativeOffset(.debug_abbrev, offset),
         .endian = di.endian,
     };
 
@@ -1416,7 +1425,7 @@ fn parseDie(
 /// Ensures that addresses in the returned LineTable are monotonically increasing.
 fn runLineNumberProgram(d: *Dwarf, gpa: Allocator, compile_unit: *CompileUnit) !CompileUnit.SrcLocCache {
     const compile_unit_cwd = try compile_unit.die.getAttrString(d, AT.comp_dir, d.section(.debug_line_str), compile_unit.*);
-    const line_info_offset = try compile_unit.die.getAttrSecOffset(AT.stmt_list);
+    const line_info_offset = try d.sectionRelativeOffset(.debug_line, try compile_unit.die.getAttrSecOffset(AT.stmt_list));
 
     var fbr: FixedBufferReader = .{
         .buf = d.section(.debug_line).?,
@@ -1723,11 +1732,11 @@ pub fn getLineNumberInfo(
 }
 
 fn getString(di: Dwarf, offset: u64) ![:0]const u8 {
-    return getStringGeneric(di.section(.debug_str), offset);
+    return getStringGeneric(di.section(.debug_str), try di.sectionRelativeOffset(.debug_str, offset));
 }
 
 fn getLineString(di: Dwarf, offset: u64) ![:0]const u8 {
-    return getStringGeneric(di.section(.debug_line_str), offset);
+    return getStringGeneric(di.section(.debug_line_str), try di.sectionRelativeOffset(.debug_line_str, offset));
 }
 
 fn readDebugAddr(di: Dwarf, compile_unit: CompileUnit, index: u64) !u64 {

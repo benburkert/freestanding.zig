@@ -30,9 +30,9 @@ const FixedBufferReader = std.debug.FixedBufferReader;
 
 const Dwarf = @This();
 
-pub const expression = @import("Dwarf/expression.zig");
-pub const abi = @import("Dwarf/abi.zig");
-pub const call_frame = @import("Dwarf/call_frame.zig");
+pub const expression = std.debug.Dwarf.expression;
+pub const abi = std.debug.Dwarf.abi;
+pub const call_frame = std.debug.Dwarf.call_frame;
 
 /// Useful to temporarily enable while working on this file.
 const debug_debug_mode = false;

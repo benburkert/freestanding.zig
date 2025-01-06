@@ -46,19 +46,3 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("run", "Run stacktrace example");
     test_step.dependOn(&run_qemu.step);
 }
-
-// fn runQemu(b: *std.Build) *std.Build.Step.Run {
-//
-//     const run_qemu = b.addSystemCommand(&[_][]const u8{"qemu-system-riscv64"});
-//     run_qemu.addArgs(&.{
-//         "-machine",   "virt",
-//         "-cpu",       "rv64",
-//         "-smp",       "1",
-//         "-m",         "32M",
-//         "-bios",      "none",
-//         "-kernel", exe_path,
-//         "-nographic",
-//     });
-//
-//     return run_qemu;
-// }

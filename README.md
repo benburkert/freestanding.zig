@@ -13,7 +13,7 @@ pub fn panic(msg: []const u8, _: ?*std.builtin.StackTrace, _: ?usize) noreturn {
     fatal();
 }
 
-fn printStackTrace(return_address: usize) !void {
+fn printStackTrace(return_address: usize, frame_address: usize) !void {
     var debug_info = try freestanding.DebugInfo.init(allocator, .{});
     defer debug_info.deinit();
 

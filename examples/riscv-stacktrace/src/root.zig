@@ -42,9 +42,12 @@ fn bar() void {
     bang();
 }
 
+var one: usize = 1;
+
 fn bang() void {
-    // TODO: @panic shows the wrong address/symbol ?
-    std.debug.panic("kaboom!", .{});
+    if (one == 1)
+        std.debug.panic("kaboom!", .{});
+    // @panic("kaboom!");
 }
 
 var panic_buffer: [0x1000000]u8 = undefined; // 16MB

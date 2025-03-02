@@ -1,5 +1,6 @@
 .{
-    .name = "freestanding",
+    .name = .freestanding,
+    .fingerprint = 0x3f76badb1fd2c6af,
     .version = "0.1.0",
 
     .dependencies = .{

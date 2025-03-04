@@ -1,5 +1,6 @@
 .{
-    .name = "riscv-stacktrace",
+    .name = .riscv_stacktrace,
+    .fingerprint = 0x6532561154e7da9,
     .version = "0.0.0",
     .dependencies = .{
         .freestanding = .{

@@ -25,6 +25,7 @@ pub fn build(b: *std.Build) void {
     exe.root_module.addImport("freestanding", freestanding.module("freestanding"));
 
     exe.setLinkerScript(b.path("src/root.ld"));
+    exe.bundle_ubsan_rt = false;
 
     b.installArtifact(exe);
 

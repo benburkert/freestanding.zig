@@ -80,3 +80,7 @@ fn exit(code: u16) noreturn {
     // unreachable
     while (true) asm volatile ("wfi");
 }
+
+pub const std_options: std.Options = .{
+    .page_size_min = 4096,
+};
